@@ -6,7 +6,7 @@ def is_valid_email(email: str) -> bool:
 
 def is_valid_username(username: str) -> bool:
     username = (username or "").strip()
-    return len(username) >= 3
+    return bool(re.match(r"^[A-Za-z0-9_]{3,30}$", username))
 
 def is_valid_password(password: str) -> bool:
     password = password or ""

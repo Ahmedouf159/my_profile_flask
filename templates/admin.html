@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% set title = "Ahmed | Admin" %}
+
+{% macro chart_bars(items, empty_text) %}
+  {% set max_count = (items | map(attribute='count') | max) if items else 0 %}
+  {% if items and max_count %}
+    <div class="chartBars">
+      {% for item in items %}
+        {% set width = (item.count / max_count * 100) | round(0, 'floor') %}
+        <div class="chartRow">
+          <div class="chartRow__top">
+            <strong>{{ item.label }}</strong>
+            <span>{{ item.count }}</span>
+          </div>
+          <div class="chartTrack">
+            <span class="chartFill" style="width: {{ width }}%"></span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">{{ empty_text }}</p>
+  {% endif %}
+{% endmacro %}
+
+{% block content %}
+<section class="dashWrap adminWrap">
+  <div class="dashTop">
+    <div>
+      <h1 class="dashH1">Admin Panel</h1>
+      <p class="dashSub muted">ML quote analytics, prediction history, and project demand overview.</p>
+    </div>
+
+    <div class="dashActions">
+      <a class="btn btn--ghost" href="{{ url_for('pages.quote') }}">Open Quote Builder</a>
+      <a class="btn btn--primary1" href="{{ url_for('user.dashboard') }}">Dashboard</a>
+    </div>
+  </div>
+
+  <div class="dashGrid adminStats">
+    <div class="dashCard">
+      <div class="dashCard__top">
+        <span class="dashIconBadge">ML</span>
+        <span class="dashLabel muted">Predictions</span>
+      </div>
+      <div class="dashValue">{{ stats.total }}</div>
+      <div class="dashHint muted small">Saved quote predictions</div>
+    </div>
+
+    <div class="dashCard">
+      <div class="dashCard__top">
+        <span class="dashIconBadge">%</span>
+        <span class="dashLabel muted">Avg Success</span>
+      </div>
+      <div class="dashValue">{{ stats.avg_success }}/100</div>
+      <div class="dashHint muted small">Machine learning score average</div>
+    </div>
+
+    <div class="dashCard">
+      <div class="dashCard__top">
+        <span class="dashIconBadge">$</span>
+        <span class="dashLabel muted">Avg Price</span>
+      </div>
+      <div class="dashValue">${{ stats.avg_price_min }} - ${{ stats.avg_price_max }}</div>
+      <div class="dashHint muted small">Average estimated client budget</div>
+    </div>
+  </div>
+
+  <div class="adminCharts">
+    <div class="dashPanel">
+      <div class="dashPanel__head">
+        <h2 class="dashH2">Project Types</h2>
+        <span class="muted small">Demand</span>
+      </div>
+      {{ chart_bars(stats.by_type, "No project type data yet.") }}
+    </div>
+
+    <div class="dashPanel">
+      <div class="dashPanel__head">
+        <h2 class="dashH2">Risk Levels</h2>
+        <span class="muted small">ML risk</span>
+      </div>
+      {{ chart_bars(stats.by_risk, "No risk data yet.") }}
+    </div>
+
+    <div class="dashPanel">
+      <div class="dashPanel__head">
+        <h2 class="dashH2">Packages</h2>
+        <span class="muted small">Starter / Pro / Advanced</span>
+      </div>
+      {{ chart_bars(stats.by_package, "No package data yet.") }}
+    </div>
+  </div>
+
+  <div class="dashPanel adminTablePanel">
+    <div class="dashPanel__head">
+      <h2 class="dashH2">Recent ML Predictions</h2>
+      <span class="muted small">Latest saved quotes</span>
+    </div>
+
+    {% if recent_quotes %}
+      <div class="tableWrap">
+        <table class="adminTable">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Package</th>
+              <th>Price</th>
+              <th>Time</th>
+              <th>Score</th>
+              <th>Risk</th>
+              <th>User</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for quote in recent_quotes %}
+              <tr>
+                <td>{{ quote.project_type }}</td>
+                <td>{{ quote.package }}</td>
+                <td>${{ quote.price_min }} - ${{ quote.price_max }}</td>
+                <td>{{ quote.days_min }} - {{ quote.days_max }} days</td>
+                <td>{{ quote.success_score }}/100</td>
+                <td><span class="riskBadge riskBadge--{{ quote.risk | lower }}">{{ quote.risk }}</span></td>
+                <td>{{ quote.username or "Visitor" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="notice warning">No predictions saved yet. Open the Quote Builder and run one ML prediction.</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -5,19 +5,23 @@
 <section class="auth">
   <div class="container auth__grid">
     <div class="auth__left" data-reveal>
-      <h1 class="auth__title">Welcome back 👋</h1>
+      <h1 class="auth__title">Welcome back</h1>
       <p class="muted">Login to open your dashboard and show your avatar letter in the header.</p>
     </div>
 
     <div class="authCard" data-reveal>
       <form method="POST" class="form">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
         <label class="label">Username or Email</label>
         <input class="input" name="identity" placeholder="ahmed or ahmed@email.com" required>
 
         <label class="label">Password</label>
-        <div class="passRow">
-          <input class="input" id="loginPass" name="password" type="password" placeholder="••••••••" required>
-          <button class="iconSmall" type="button" data-toggle-pass="loginPass" aria-label="Show/Hide password">👁</button>
+        <div class="password-wrap">
+          <input type="password" id="password" name="password" placeholder="Password" required>
+          <button type="button" class="toggle-pass" data-target="password" aria-label="Show password">
+            Show
+          </button>
         </div>
 
         <label class="checkRow">
@@ -27,8 +31,10 @@
 
         <button class="btn btn--primary w100" type="submit">Login</button>
 
+        {% include "_social_auth.html" %}
+
         <p class="muted small center">
-          Don’t have an account? <a class="link" href="{{ url_for('signup') }}">Sign up</a>
+          Don't have an account? <a class="link" href="{{ url_for('auth.signup') }}">Sign up</a>
         </p>
       </form>
     </div>

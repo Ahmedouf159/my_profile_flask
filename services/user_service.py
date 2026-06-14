@@ -9,7 +9,7 @@ def change_username(user_id: int, new_username: str):
         return True, None  # no change
 
     if not is_valid_username(new_username):
-        return False, "Username must be at least 3 characters."
+        return False, "Username must be 3-30 characters and use only letters, numbers, or underscores."
 
     try:
         update_username(user_id, new_username)

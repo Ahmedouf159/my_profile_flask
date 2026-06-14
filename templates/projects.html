@@ -1,29 +1,141 @@
 {% extends "base.html" %}
-{% block title %}Projects{% endblock %}
+{% set title = "Projects" %}
 {% block content %}
-<section class="section">
-  <div class="container">
-    <div class="glass hero-card reveal">
-      <div class="badge"><img class="icon" src="{{ url_for('static', filename='assets/preview.png') }}" alt=""> Projects</div>
-      <h1 style="margin-top:12px;">Projects</h1>
-      <p class="big-paragraph">Show your best work here with stack + links + screenshots.</p>
-    </div>
 
-    <div class="section">
-      <h2 class="reveal">Project Grid</h2>
-      <div class="cards">
-        {% for i in range(1,10) %}
-        <div class="card reveal">
-          <div class="top"><h3>Project {{ i }}</h3><span class="badge">Flask • JS</span></div>
-          <p>Replace this description with your real case study summary.</p>
-          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
-            <a class="btn" href="#"><img class="icon" src="{{ url_for('static', filename='assets/code.png') }}" alt=""> Code</a>
-            <a class="btn" href="#"><img class="icon" src="{{ url_for('static', filename='assets/preview.png') }}" alt=""> Live</a>
-          </div>
-        </div>
-        {% endfor %}
+<section class="pageTop">
+  <div class="container" data-reveal>
+    <h1 class="pageTitle">Selected Projects</h1>
+    <p class="pageSub">
+      A focused collection of Flask, frontend, and Python automation work. Each project is designed to be small, useful, and complete.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="cards">
+    <article class="project-card">
+      <div class="project-media">
+        <img src="{{ url_for('static', filename='assets/preview.png') }}" alt="">
       </div>
+      <div class="top">
+        <h3>Portfolio Auth System</h3>
+        <span class="badge">Flask | SQLite | Pytest</span>
+      </div>
+      <p>
+        A personal portfolio app with signup, login, protected dashboard, profile editing, CSRF protection, theme settings, and tests.
+      </p>
+      <ul class="project-list">
+        <li><strong>Role:</strong> Full-stack Flask development.</li>
+        <li><strong>Impact:</strong> Turns a basic profile site into a secure, testable account experience.</li>
+        <li>Modular Flask app factory with blueprints.</li>
+        <li>Hashed passwords and safer session settings.</li>
+        <li>Test suite for auth, protected routes, profile updates, and CSRF.</li>
+      </ul>
+      <div class="project-actions">
+        <a class="btn" href="{{ url_for('auth.signup') }}">Try Demo</a>
+        <a class="btn outline" href="{{ github_url }}" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="btn outline" href="{{ youtube_url }}" target="_blank" rel="noopener noreferrer">YouTube</a>
+      </div>
+    </article>
+
+    <article class="project-card">
+      <div class="project-media">
+        <img src="{{ url_for('static', filename='assets/home.png') }}" alt="">
+      </div>
+      <div class="top">
+        <h3>Restaurant Ordering App</h3>
+        <span class="badge">Flask | SQL | UI</span>
+      </div>
+      <p>
+        A restaurant workflow concept with menu pages, cart behavior, order summaries, and a database-ready backend structure.
+      </p>
+      <ul class="project-list">
+        <li><strong>Role:</strong> Product flow and interface design.</li>
+        <li><strong>Impact:</strong> Makes ordering simple across mobile and desktop screens.</li>
+        <li>Clear menu categories and cart-first user flow.</li>
+        <li>Backend-ready structure for orders and users.</li>
+        <li>Responsive UI designed for phone and desktop use.</li>
+      </ul>
+      <div class="project-actions">
+        <a class="btn" href="{{ contact_url }}" target="_blank" rel="noopener noreferrer">Ask About It</a>
+        <a class="btn outline" href="{{ github_url }}" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="btn outline" href="{{ youtube_url }}" target="_blank" rel="noopener noreferrer">YouTube</a>
+      </div>
+    </article>
+
+    <article class="project-card">
+      <div class="project-media">
+        <img src="{{ url_for('static', filename='assets/code.png') }}" alt="">
+      </div>
+      <div class="top">
+        <h3>Python Automation Kit</h3>
+        <span class="badge">Python | Files | Reports</span>
+      </div>
+      <p>
+        A set of scripts for repetitive work: renaming files, organizing folders, cleaning data, and creating simple reports.
+      </p>
+      <ul class="project-list">
+        <li><strong>Role:</strong> Python scripting and cleanup logic.</li>
+        <li><strong>Impact:</strong> Reduces repetitive manual work into repeatable commands.</li>
+        <li>Command-line style tools for repeatable tasks.</li>
+        <li>Readable functions that can be tested and reused.</li>
+        <li>Designed for real daily workflow improvements.</li>
+      </ul>
+      <div class="project-actions">
+        <a class="btn" href="{{ contact_url }}" target="_blank" rel="noopener noreferrer">Request Demo</a>
+        <a class="btn outline" href="{{ github_url }}" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="btn outline" href="{{ youtube_url }}" target="_blank" rel="noopener noreferrer">YouTube</a>
+      </div>
+    </article>
+
+    <article class="project-card">
+      <div class="project-media">
+        <img src="{{ url_for('static', filename='assets/search.png') }}" alt="">
+      </div>
+      <div class="top">
+        <h3>Search & Filter UI</h3>
+        <span class="badge">HTML | CSS | JS</span>
+      </div>
+      <p>
+        A frontend pattern for filtering project cards, user records, or product lists with clean empty states and mobile-friendly controls.
+      </p>
+      <ul class="project-list">
+        <li><strong>Role:</strong> Frontend component behavior.</li>
+        <li><strong>Impact:</strong> Helps users scan and narrow larger lists quickly.</li>
+        <li>Fast client-side filtering behavior.</li>
+        <li>Accessible labels and predictable UI states.</li>
+        <li>Reusable card and badge styling.</li>
+      </ul>
+      <div class="project-actions">
+        <a class="btn" href="{{ contact_url }}" target="_blank" rel="noopener noreferrer">Discuss Feature</a>
+        <a class="btn outline" href="{{ github_url }}" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="btn outline" href="{{ youtube_url }}" target="_blank" rel="noopener noreferrer">YouTube</a>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section">
+  <div class="contact-panel">
+    <div>
+      <h2>More work is on YouTube.</h2>
+      <p class="muted">
+        Visit {{ brand_name }} for project updates, walkthroughs, and new coding work.
+      </p>
+    </div>
+    <div class="contact-actions">
+      <a class="btn primary" href="{{ contact_url }}" target="_blank" rel="noopener noreferrer">Contact</a>
+      <a class="btn" href="{{ github_url }}" target="_blank" rel="noopener noreferrer">
+        <img class="btn-icon" src="{{ url_for('static', filename='assets/github.svg') }}" alt="">
+        GitHub
+      </a>
+      <a class="btn btn--youtube" href="{{ youtube_url }}" target="_blank" rel="noopener noreferrer">
+        <img class="btn-icon" src="{{ url_for('static', filename='assets/youtube.svg') }}" alt="">
+        YouTube
+      </a>
+      <a class="btn" href="{{ url_for('pages.index') }}#contact">Back Home</a>
     </div>
   </div>
 </section>
+
 {% endblock %}

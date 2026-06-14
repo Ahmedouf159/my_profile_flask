@@ -1,126 +1,175 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- HERO -->
 <section class="hero" data-reveal>
   <div class="hero-left">
-    <h1 class="hero-title">Ahmed Web & Backend Developer</h1>
+    <div class="hero-brand-card" aria-label="{{ brand_name }} profile">
+      <div>
+        <span class="hero-kicker">{{ youtube_handle }}</span>
+        <h1 class="hero-title">{{ brand_name }}</h1>
+        <p class="hero-brand-copy">Python, Flask, web projects, and coding tutorials.</p>
+      </div>
+      <div class="hero-avatar" aria-hidden="true">A</div>
+    </div>
 
     <p class="hero-sub">
-      Young developer building real programs for web and desktop using Python and modern technologies.
+      Ahmed builds Flask apps that feel complete: login systems, dashboards, databases, and automation tools with Python.
     </p>
 
     <p class="hero-desc">
-      Hello, my name is Ahmed. I enjoy building web apps and backend systems.
-      I believe programming is the future and I love learning new things every day.
+      This portfolio is built as a real Flask project: modular routes, services, database models, secure sessions,
+      CSRF protection, tests, and responsive UI.
     </p>
 
     <div class="hero-buttons">
-      <a href="/signup" class="btn primary">Sign up</a>
-      <a href="/login" class="btn">Login</a>
-      <a href="#projects" class="btn outline">View Projects</a>
+      <a href="{{ url_for('pages.projects') }}" class="btn primary">View Projects</a>
+      <a href="{{ github_url }}" class="btn" target="_blank" rel="noopener noreferrer">
+        <img class="btn-icon" src="{{ url_for('static', filename='assets/github.svg') }}" alt="">
+        GitHub
+      </a>
+      <a href="{{ youtube_url }}" class="btn btn--youtube" target="_blank" rel="noopener noreferrer">
+        <img class="btn-icon" src="{{ url_for('static', filename='assets/youtube.svg') }}" alt="">
+        YouTube
+      </a>
+      <a href="{{ url_for('auth.signup') }}" class="btn outline">Try Dashboard</a>
     </div>
 
     <div class="tech">
-      Python • Flask • SQL • HTML • CSS • JavaScript
+      Python | Flask | SQLite | HTML | CSS | JavaScript | Pytest
+    </div>
+
+    <div class="hero-proof" aria-label="Project highlights">
+      <div class="proof-card">
+        <span class="proof-value">6</span>
+        <span class="proof-label">passing tests</span>
+      </div>
+      <div class="proof-card">
+        <span class="proof-value">4</span>
+        <span class="proof-label">modular route groups</span>
+      </div>
+      <div class="proof-card">
+        <span class="proof-value">100%</span>
+        <span class="proof-label">responsive layout</span>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- WHAT I BUILD -->
 <section class="section" data-reveal>
-  <h2>What I’m Building</h2>
+  <h2>What I Build</h2>
+  <p class="section-sub">Small projects, finished properly: UI, backend, validation, database, and tests.</p>
 
   <div class="grid-3">
     <div class="card">
-      <h3>Web Apps</h3>
-      <p>Login systems, dashboards, full websites.</p>
+      <h3>Flask Web Apps</h3>
+      <p>Multi-page apps with clean routes, templates, protected pages, forms, and reusable service logic.</p>
     </div>
 
     <div class="card">
-      <h3>Backend Systems</h3>
-      <p>Flask APIs, authentication, databases.</p>
+      <h3>Auth & Dashboards</h3>
+      <p>Signup, login, hashed passwords, sessions, account pages, settings, and user-friendly dashboard flows.</p>
     </div>
 
     <div class="card">
-      <h3>Automation</h3>
-      <p>Python tools for real tasks and workflows.</p>
+      <h3>Automation Tools</h3>
+      <p>Python scripts and small utilities for repetitive tasks, data cleanup, reports, and workflow shortcuts.</p>
     </div>
   </div>
-
-  <p class="center small">From Egypt • Started 2024 • 12+ Projects</p>
 </section>
 
-<!-- PORTFOLIO -->
 <section class="section" id="projects" data-reveal>
-  <h2>Portfolio Gallery</h2>
-  <p class="section-sub">Screenshots + description for each project.</p>
+  <h2>Featured Work</h2>
+  <p class="section-sub">Three focused projects that show frontend polish plus backend thinking.</p>
 
   <div class="grid-3">
-    <div class="project-card">
-      <h3>Web Calculator</h3>
-      <p>Fast calculator with clean UI and keyboard support.</p>
-      <a href="#" class="btn small">View</a>
-    </div>
+    <article class="project-card">
+      <div class="project-media">
+        <img src="{{ url_for('static', filename='assets/preview.png') }}" alt="">
+      </div>
+      <h3>Portfolio Auth System</h3>
+      <p>Flask account system with SQLite users, hashed passwords, CSRF tokens, dashboard, profile, and tests.</p>
+      <div class="project-actions">
+        <a href="{{ url_for('pages.projects') }}" class="btn small">Case Study</a>
+      </div>
+    </article>
 
-    <div class="project-card">
-      <h3>Restaurant App</h3>
-      <p>Menu + cart system built with Flask and SQL.</p>
-      <a href="#" class="btn small">View</a>
-    </div>
+    <article class="project-card">
+      <div class="project-media">
+        <img src="{{ url_for('static', filename='assets/home.png') }}" alt="">
+      </div>
+      <h3>Restaurant Ordering App</h3>
+      <p>Menu, cart, order summary, and admin-ready structure for a restaurant workflow built with Flask.</p>
+      <div class="project-actions">
+        <a href="{{ url_for('pages.projects') }}" class="btn small">Case Study</a>
+      </div>
+    </article>
 
-    <div class="project-card">
-      <h3>Python + Excel Tools</h3>
-      <p>Automation scripts for Excel tasks.</p>
-      <a href="#" class="btn small">View</a>
-    </div>
+    <article class="project-card">
+      <div class="project-media">
+        <img src="{{ url_for('static', filename='assets/code.png') }}" alt="">
+      </div>
+      <h3>Python Automation Kit</h3>
+      <p>Command-line tools for file cleanup, Excel-style reports, and repeatable productivity tasks.</p>
+      <div class="project-actions">
+        <a href="{{ url_for('pages.projects') }}" class="btn small">Case Study</a>
+      </div>
+    </article>
   </div>
 </section>
 
-<!-- BLOG -->
 <section class="section" data-reveal>
-  <h2>Blog</h2>
+  <h2>How I Work</h2>
   <div class="grid-2">
     <div class="card">
-      <h3>How I started coding (2024)</h3>
-      <p>I began with small programs then moved to web development.</p>
+      <h3>Build Small, Finish Strong</h3>
+      <p>I focus on complete features: routes, validation, UI states, database behavior, and tests.</p>
     </div>
 
     <div class="card">
-      <h3>Why I like Python</h3>
-      <p>Python is simple, powerful, and perfect for web + automation.</p>
+      <h3>Learn in Public</h3>
+      <p>Every project becomes a better version of the last one: cleaner structure, clearer UI, and safer code.</p>
     </div>
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section class="section" data-reveal>
-  <h2>Testimonials</h2>
-  <div class="grid-3">
-    <div class="card">“Ahmed learns fast and builds real projects.”</div>
-    <div class="card">“Creative developer with strong logic skills.”</div>
-    <div class="card">“Keeps improving and loves challenges.”</div>
-  </div>
-</section>
-
-<!-- FAQ -->
 <section class="section" data-reveal>
   <h2>FAQ</h2>
 
   <details>
-    <summary>Why do you like programming?</summary>
-    <p>Because it allows me to build real tools and solve real problems.</p>
+    <summary>What is your strongest skill right now?</summary>
+    <p>Python and Flask backend development, especially authentication, routes, database-backed pages, and practical tools.</p>
   </details>
 
   <details>
-    <summary>Favorite language?</summary>
-    <p>Python — clean, powerful, and versatile.</p>
+    <summary>What are you improving next?</summary>
+    <p>Real deployments, stronger project screenshots, CI, PostgreSQL, and deeper frontend polish.</p>
   </details>
 
   <details>
-    <summary>Future goal?</summary>
-    <p>Build advanced systems and intelligent software.</p>
+    <summary>Can this portfolio be deployed?</summary>
+    <p>Yes. It includes production notes, environment-based secrets, tests, and a WSGI server option for Windows.</p>
   </details>
+</section>
+
+<section class="section" id="contact" data-reveal>
+  <div class="contact-panel">
+    <div>
+      <h2>Ready to build the next project.</h2>
+      <p class="muted">Send a message, review the code, or open the dashboard demo to see the app flow.</p>
+    </div>
+    <div class="contact-actions">
+      <a class="btn primary" href="{{ contact_url }}" target="_blank" rel="noopener noreferrer">Email Ahmed</a>
+      <a class="btn" href="{{ github_url }}" target="_blank" rel="noopener noreferrer">
+        <img class="btn-icon" src="{{ url_for('static', filename='assets/github.svg') }}" alt="">
+        GitHub
+      </a>
+      <a class="btn btn--youtube" href="{{ youtube_url }}" target="_blank" rel="noopener noreferrer">
+        <img class="btn-icon" src="{{ url_for('static', filename='assets/youtube.svg') }}" alt="">
+        {{ brand_name }}
+      </a>
+      <a class="btn outline" href="{{ url_for('auth.signup') }}">Try Demo</a>
+    </div>
+  </div>
 </section>
 
 {% endblock %}

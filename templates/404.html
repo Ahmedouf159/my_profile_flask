@@ -8,23 +8,23 @@
       <div class="errorCode">404</div>
       <h1 class="errorTitle">Page Not Found</h1>
       <p class="muted">
-        This page doesn’t exist yet, or the link is wrong.
+        This page does not exist yet, or the link is wrong.
       </p>
 
       <div class="errorTip">
-        <strong>Pro tip ✅</strong>
+        <strong>Pro tip</strong>
         <p class="muted small">
-          If you clicked “Blog”, it’s not ready yet. Build the route later or remove the link.
+          If you clicked Blog, it is not ready yet. Build the route later or remove the link.
         </p>
       </div>
 
       <div class="errorActions">
-        <a class="btn btn--primary" href="{{ url_for('index') }}">Go Home</a>
+        <a class="btn btn--primary" href="{{ url_for('pages.index') }}">Go Home</a>
         {% if not current_user %}
-          <a class="btn btn--ghost" href="{{ url_for('login') }}">Login</a>
-          <a class="btn btn--ghost" href="{{ url_for('signup') }}">Sign up</a>
+          <a class="btn btn--ghost" href="{{ url_for('auth.login') }}">Login</a>
+          <a class="btn btn--ghost" href="{{ url_for('auth.signup') }}">Sign up</a>
         {% else %}
-          <a class="btn btn--ghost" href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a class="btn btn--ghost" href="{{ url_for('user.dashboard') }}">Dashboard</a>
         {% endif %}
       </div>
     </div>

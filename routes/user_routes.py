@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, current_app, jsonify, render_template, request, redirect, url_for, flash, session
 from utils.decorators import login_required
 from models.user_model import find_user_by_id
 from services.user_service import change_username, change_password
@@ -9,6 +9,32 @@ user_bp = Blueprint("user", __name__)
 @login_required
 def dashboard():
     return render_template("dashboard.html")
+
+
+@user_bp.post("/api/secret-offer")
+@login_required
+def secret_offer():
+    data = request.get_json(silent=True) or {}
+    code = (data.get("code") or "").strip().upper()
+
+    if code != current_app.config["SECRET_OFFER_CODE"]:
+        return jsonify({"ok": False, "error": "Invalid secret code."}), 400
+
+    return jsonify(
+        {
+            "ok": True,
+            "offer": {
+                "name": current_app.config["SECRET_OFFER_NAME"],
+                "price": current_app.config["SECRET_OFFER_PRICE"],
+                "includes": [
+                    "3 page responsive website",
+                    "Contact buttons and social links",
+                    "Basic Flask dashboard",
+                    "Delivery in 3-5 days",
+                ],
+            },
+        }
+    )
 
 @user_bp.route("/profile", methods=["GET", "POST"])
 @login_required

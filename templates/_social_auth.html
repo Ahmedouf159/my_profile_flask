@@ -1,0 +1,33 @@
+<div class="socialAuth" aria-label="Social login options">
+  <div class="divider"><span>or continue with</span></div>
+
+  <div class="socialAuth__grid">
+    <a
+      class="btn socialAuth__btn"
+      href="{{ url_for('auth.oauth_login', provider='google') }}"
+      aria-disabled="{{ 'false' if social_login.google.configured else 'true' }}"
+    >
+      <span class="socialAuth__mark socialAuth__mark--google">G</span>
+      Google
+    </a>
+
+    <a
+      class="btn socialAuth__btn socialAuth__btn--facebook"
+      href="{{ url_for('auth.oauth_login', provider='facebook') }}"
+      aria-disabled="{{ 'false' if social_login.facebook.configured else 'true' }}"
+    >
+      <span class="socialAuth__mark socialAuth__mark--facebook">f</span>
+      Facebook
+    </a>
+  </div>
+
+  {% if social_login.google.missing_dependency or social_login.facebook.missing_dependency %}
+    <p class="inline-help center">Install Authlib to activate social login.</p>
+  {% elif social_login.google.configured and not social_login.facebook.configured %}
+    <p class="inline-help center">Google is ready. Add Facebook credentials later if you need it.</p>
+  {% elif not social_login.google.configured and social_login.facebook.configured %}
+    <p class="inline-help center">Facebook is ready. Add Google credentials later if you need it.</p>
+  {% elif not social_login.google.configured and not social_login.facebook.configured %}
+    <p class="inline-help center">Add OAuth client IDs and secrets to activate these buttons.</p>
+  {% endif %}
+</div>

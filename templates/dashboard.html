@@ -6,47 +6,48 @@
     <div>
       <h1 class="dashH1">Dashboard</h1>
       <p class="dashSub muted">
-        Welcome back, <strong>{{ current_user.username }}</strong>. Here’s your quick overview.
+        Welcome back, <strong>{{ current_user.username }}</strong>. Here's your quick overview.
       </p>
     </div>
 
     <div class="dashActions">
-      <a class="btn btn--ghost" href="{{ url_for('profile') }}">Profile</a>
-      <a class="btn btn--primary1" href="{{ url_for('index') }}#projects">View Projects</a>
+      <a class="btn btn--ghost" href="{{ url_for('user.profile') }}">Profile</a>
+      {% if current_user.is_admin %}
+        <a class="btn btn--ghost" href="{{ url_for('admin.admin_dashboard') }}">Admin Panel</a>
+      {% endif %}
+      <a class="btn btn--primary1" href="{{ url_for('pages.index') }}#projects">View Projects</a>
     </div>
   </div>
 
-  <!-- Quick stats -->
   <div class="dashGrid">
     <div class="dashCard">
       <div class="dashCard__top">
-        <span class="dashIconBadge">⚡</span>
+        <span class="dashIconBadge">13+</span>
         <span class="dashLabel muted">Projects</span>
       </div>
-      <div class="dashValue">12+</div>
-      <div class="dashHint muted small">Real apps & tools built since 2024</div>
+      <div class="dashValue">13+</div>
+      <div class="dashHint muted small">Real apps and tools built since 2024</div>
     </div>
 
     <div class="dashCard">
       <div class="dashCard__top">
-        <span class="dashIconBadge">🧠</span>
+        <span class="dashIconBadge">PY</span>
         <span class="dashLabel muted">Skills</span>
       </div>
-      <div class="dashValue">Python • Flask</div>
-      <div class="dashHint muted small">SQL • HTML • CSS • JavaScript</div>
+      <div class="dashValue">Python | Flask</div>
+      <div class="dashHint muted small">SQL | HTML | CSS | JavaScript</div>
     </div>
 
     <div class="dashCard">
       <div class="dashCard__top">
-        <span class="dashIconBadge">✅</span>
+        <span class="dashIconBadge">OK</span>
         <span class="dashLabel muted">Status</span>
       </div>
       <div class="dashValue">Active</div>
-      <div class="dashHint muted small">Learning + shipping updates weekly</div>
+      <div class="dashHint muted small">Learning and shipping updates weekly</div>
     </div>
   </div>
 
-  <!-- Main panels -->
   <div class="dashPanels">
     <div class="dashPanel">
       <div class="dashPanel__head">
@@ -55,19 +56,45 @@
       </div>
 
       <div class="dashLinks">
-        <a class="dashLink" href="{{ url_for('index') }}">
-          <span>🏠</span><span>Home</span>
+        <a class="dashLink" href="{{ url_for('pages.index') }}">
+          <span>Home</span>
         </a>
-        <a class="dashLink" href="{{ url_for('about') }}">
-          <span>👤</span><span>About</span>
+        <a class="dashLink" href="{{ url_for('pages.about') }}">
+          <span>About</span>
         </a>
-        <a class="dashLink" href="{{ url_for('services') }}">
-          <span>🧰</span><span>Services</span>
+        <a class="dashLink" href="{{ url_for('pages.services') }}">
+          <span>Services</span>
         </a>
-        <a class="dashLink" href="{{ url_for('profile') }}">
-          <span>⚙️</span><span>Profile</span>
+        <a class="dashLink" href="{{ url_for('user.profile') }}">
+          <span>Profile</span>
         </a>
+        <a class="dashLink" href="{{ url_for('settings.settings') }}">
+          <span>Settings</span>
+        </a>
+        {% if current_user.is_admin %}
+          <a class="dashLink" href="{{ url_for('admin.admin_dashboard') }}">
+            <span>Admin Panel</span>
+          </a>
+        {% endif %}
       </div>
+    </div>
+
+    <div class="dashPanel secretOffer">
+      <div class="dashPanel__head">
+        <h2 class="dashH2">Secret Offer</h2>
+        <span class="muted small">Enter the private code</span>
+      </div>
+
+      <form class="form" id="secretOfferForm">
+        <div class="field">
+          <label for="secretOfferCode">Secret key</label>
+          <input class="input" id="secretOfferCode" name="code" placeholder="Enter secret code" autocomplete="off">
+          <span class="inline-help">Unlock the current project package price.</span>
+        </div>
+        <button class="btn btn--primary w100" type="submit">Reveal Price</button>
+      </form>
+
+      <div class="secretOfferResult" id="secretOfferResult" hidden></div>
     </div>
 
     <div class="dashPanel">
@@ -77,14 +104,14 @@
       </div>
 
       <ul class="dashList">
-        <li>Add 1 screenshot per project (Gallery cards)</li>
-        <li>Create a “Projects” page (each project has details)</li>
-        <li>Add contact buttons (Email / GitHub / LinkedIn)</li>
-        <li>Write 1 blog post per week (short & simple)</li>
+        <li>Add one screenshot per project gallery card.</li>
+        <li>Create a detailed page for each project.</li>
+        <li>Add contact buttons for email and YouTube.</li>
+        <li>Write one short blog post per week.</li>
       </ul>
 
       <div class="dashNote">
-        <strong>Tip:</strong> Keep projects small but complete. Finish > perfect.
+        <strong>Tip:</strong> Keep projects small but complete. Finish beats perfect.
       </div>
     </div>
   </div>

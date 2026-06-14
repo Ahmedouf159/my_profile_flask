@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% set title = "Ahmed | Project Quote" %}
+{% set description = "Build a realistic website project quote for Flask, portfolio, business, dashboard, and login work by Codac with Ahmed." %}
+
+{% block content %}
+<section class="pageTop">
+  <div class="container">
+    <span class="hero-kicker">Instant estimate</span>
+    <h1 class="pageTitle">Project Quote Builder</h1>
+    <p class="pageSub">Choose the project shape and get a machine-learning prediction for price, time, risk, and success chance.</p>
+  </div>
+</section>
+
+<section class="section quoteSection">
+  <div class="container quoteLayout">
+    <form class="quoteForm" id="quoteForm" data-contact-email="{{ contact_email }}">
+      <div class="quoteGroup">
+        <div class="quoteGroup__head">
+          <h2>Project Type</h2>
+          <span class="muted small">Main goal</span>
+        </div>
+
+        <div class="quoteOptions quoteOptions--grid">
+          <label class="quoteOption">
+            <input type="radio" name="projectType" value="portfolio" checked>
+            <span>
+              <strong>Portfolio</strong>
+              <small>Personal brand and projects</small>
+            </span>
+          </label>
+          <label class="quoteOption">
+            <input type="radio" name="projectType" value="business">
+            <span>
+              <strong>Business</strong>
+              <small>Services, contact, trust</small>
+            </span>
+          </label>
+          <label class="quoteOption">
+            <input type="radio" name="projectType" value="store">
+            <span>
+              <strong>Store</strong>
+              <small>Products and orders</small>
+            </span>
+          </label>
+          <label class="quoteOption">
+            <input type="radio" name="projectType" value="dashboard">
+            <span>
+              <strong>Dashboard</strong>
+              <small>Login and app screens</small>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="quoteControls">
+        <div class="field">
+          <label for="quotePages">Pages</label>
+          <select id="quotePages" name="pages">
+            <option value="1">1 page</option>
+            <option value="3" selected>3 pages</option>
+            <option value="5">5 pages</option>
+            <option value="8">8+ pages</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="quoteDeadline">Deadline</label>
+          <select id="quoteDeadline" name="deadline">
+            <option value="normal" selected>Normal</option>
+            <option value="fast">Fast</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="quoteBudget">Budget</label>
+          <select id="quoteBudget" name="budget">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+            <option value="flexible">Flexible</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="quoteGroup">
+        <div class="quoteGroup__head">
+          <h2>Features</h2>
+          <span class="muted small">Add what you need</span>
+        </div>
+
+        <div class="quoteOptions">
+          <label class="quoteCheck">
+            <input type="checkbox" name="features" value="contact" checked>
+            <span>Contact form and social buttons</span>
+          </label>
+          <label class="quoteCheck">
+            <input type="checkbox" name="features" value="auth">
+            <span>Login and signup system</span>
+          </label>
+          <label class="quoteCheck">
+            <input type="checkbox" name="features" value="socialAuth">
+            <span>Google or Facebook login</span>
+          </label>
+          <label class="quoteCheck">
+            <input type="checkbox" name="features" value="admin">
+            <span>Admin dashboard</span>
+          </label>
+          <label class="quoteCheck">
+            <input type="checkbox" name="features" value="database">
+            <span>Database setup</span>
+          </label>
+          <label class="quoteCheck">
+            <input type="checkbox" name="features" value="payments">
+            <span>Payment page setup</span>
+          </label>
+        </div>
+      </div>
+    </form>
+
+    <aside class="quoteResult" id="quoteResult" aria-live="polite">
+      <div class="quoteResult__top">
+        <span class="quoteBadge">Smart estimate</span>
+        <span class="muted small" id="quoteComplexity">Medium</span>
+      </div>
+
+      <div class="quotePrice" id="quotePrice">$35 - $60</div>
+      <div class="quoteTime" id="quoteTime">2 - 4 days</div>
+
+      <div class="mlPrediction">
+        <div class="mlScore">
+          <span id="mlSuccessScore">--</span>
+          <small>/100</small>
+        </div>
+        <div>
+          <h2>ML Success Prediction</h2>
+          <p><strong id="mlPackage">Calculating...</strong> package</p>
+          <p>Risk: <strong id="mlRisk">--</strong></p>
+          <p class="muted small" id="mlModel">Training local model...</p>
+        </div>
+      </div>
+
+      <div class="quoteSummary">
+        <h2>Recommended Stack</h2>
+        <p id="quoteStack">HTML, CSS, JavaScript, Flask</p>
+      </div>
+
+      <div class="quoteSummary">
+        <h2>Included</h2>
+        <ul id="quoteIncludes"></ul>
+      </div>
+
+      <div class="quoteSummary">
+        <h2>ML Advice</h2>
+        <ul id="mlAdvice">
+          <li>Choose your project details to see model advice.</li>
+        </ul>
+      </div>
+
+      <div class="roadmapPanel">
+        <div class="quoteResult__top">
+          <span class="quoteBadge">Build Roadmap</span>
+          <span class="muted small" id="roadmapTotal">Auto plan</span>
+        </div>
+        <div class="roadmapTimeline" id="roadmapTimeline"></div>
+        <div class="roadmapChecklist">
+          <h2>Launch Checklist</h2>
+          <ul id="roadmapChecklist"></ul>
+        </div>
+      </div>
+
+      <div class="quoteActions">
+        <button class="btn btn--ghost w100" id="mlPredict" type="button">Run ML Prediction</button>
+        <a class="btn btn--ghost w100" id="proposalDownload" target="_blank" rel="noopener noreferrer" href="{{ url_for('pages.quote_proposal_pdf') }}">
+          Download Proposal PDF
+        </a>
+        <a class="btn btn--primary w100" id="quoteEmail" target="_blank" rel="noopener noreferrer" href="{{ contact_url }}">
+          Email Ahmed This Quote
+        </a>
+        <button class="btn btn--ghost w100" id="quoteReset" type="button">Reset</button>
+      </div>
+
+      <p class="muted small">Final price can change after reviewing the full idea.</p>
+    </aside>
+  </div>
+</section>
+{% endblock %}

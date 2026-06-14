@@ -1,13 +1,24 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{{ title if title else "Ahmed" }}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="description" content="{{ description if description else 'Codac with Ahmed is a Flask, Python, and web development portfolio with projects, tutorials, and a working dashboard demo.' }}">
+  <meta name="theme-color" content="#2563eb">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ title if title else brand_name }}">
+  <meta property="og:description" content="{{ description if description else 'Flask, Python, web projects, tutorials, and portfolio work by Codac with Ahmed.' }}">
+  <meta property="og:url" content="{{ request.url }}">
+  <meta property="og:image" content="{{ site_url }}{{ url_for('static', filename='assets/preview.png') }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{{ title if title else brand_name }}">
+  <meta name="twitter:description" content="{{ description if description else 'Flask, Python, web projects, tutorials, and portfolio work by Codac with Ahmed.' }}">
+  <title>{{ title if title else brand_name }}</title>
 
+  <link rel="canonical" href="{{ request.url }}">
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/favicon-32x32.png') }}">
 
-  <!-- ✅ Apply saved theme BEFORE CSS loads -->
   <script>
     (function () {
       const saved = localStorage.getItem("theme");
@@ -17,32 +28,35 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body class="site">
 
 <header class="header" id="top">
   <div class="container header__inner">
-
-    <a class="brand" href="{{ url_for('index') }}">
+    <a class="brand" href="{{ url_for('pages.index') }}">
       <span class="brand__dot" aria-hidden="true"></span>
-      <span class="brand__name">Ahmed</span>
+      <span class="brand__name">{{ brand_name }}</span>
     </a>
 
     <nav class="nav" id="nav">
-      <a class="nav__link" href="{{ url_for('index') }}">Home</a>
-      <a class="nav__link" href="{{ url_for('about') }}">About</a>
-      <a class="nav__link" href="{{ url_for('services') }}">Services</a>
-
+      <a class="nav__link" href="{{ url_for('pages.index') }}">Home</a>
+      <a class="nav__link" href="{{ url_for('pages.about') }}">About</a>
+      <a class="nav__link" href="{{ url_for('pages.services') }}">Services</a>
+      <a class="nav__link" href="{{ url_for('pages.quote') }}">Quote</a>
+      <a class="nav__link" href="{{ url_for('pages.projects') }}">Projects</a>
       {% if current_user %}
-        <a class="nav__link" href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a class="nav__link" href="{{ url_for('user.dashboard') }}">Dashboard</a>
+        {% if current_user.is_admin %}
+          <a class="nav__link" href="{{ url_for('admin.admin_dashboard') }}">Admin</a>
+        {% endif %}
       {% endif %}
     </nav>
 
     <div class="header__actions">
       <button class="btn btn--ghost themeToggle" id="themeToggle" type="button" aria-label="Toggle theme">
-        <span class="themeToggle__sun">☀️</span>
-        <span class="themeToggle__moon">🌙</span>
+        <span class="themeToggle__sun">Light</span>
+        <span class="themeToggle__moon">Dark</span>
       </button>
 
       {% if current_user %}
@@ -51,7 +65,11 @@
             <img src="{{ url_for('static', filename='assets/menu-dots-vertical.png') }}" alt="More">
           </button>
           <div class="dropdown" id="dotsMenu" aria-hidden="true">
-            <a class="ddItem" href="{{ url_for('profile') }}">Profile</a>
+            <a class="ddItem" href="{{ url_for('user.profile') }}">Profile</a>
+            <a class="ddItem" href="{{ url_for('settings.settings') }}">Settings</a>
+            {% if current_user.is_admin %}
+              <a class="ddItem" href="{{ url_for('admin.admin_dashboard') }}">Admin</a>
+            {% endif %}
             <a class="ddItem" href="{{ url_for('blog') }}">Blog</a>
           </div>
         </div>
@@ -65,42 +83,49 @@
               <div class="ddName">{{ current_user.username }}</div>
               <div class="ddEmail">{{ current_user.email }}</div>
             </div>
-            <a class="ddItem" href="{{ url_for('profile') }}">Profile</a>
-            <a class="ddItem" href="{{ url_for('logout') }}">Logout</a>
+            <a class="ddItem" href="{{ url_for('user.profile') }}">Profile</a>
+            {% if current_user.is_admin %}
+              <a class="ddItem" href="{{ url_for('admin.admin_dashboard') }}">Admin</a>
+            {% endif %}
+            <a class="ddItem" href="{{ url_for('auth.logout') }}">Logout</a>
           </div>
         </div>
       {% else %}
-        <a class="btn btn--ghost" href="{{ url_for('login') }}">Login</a>
-        <a class="btn btn--primary1" href="{{ url_for('signup') }}">Sign up</a>
+        <a class="btn btn--ghost" href="{{ url_for('auth.login') }}">Login</a>
+        <a class="btn btn--primary1" href="{{ url_for('auth.signup') }}">Sign up</a>
       {% endif %}
 
-      <!-- ✅ correct id -->
       <button class="hamburger" id="hamburger" type="button" aria-label="Open menu" aria-expanded="false">
         <img src="{{ url_for('static', filename='assets/menu-burger.png') }}" alt="Menu">
       </button>
     </div>
   </div>
 
-  <!-- ✅ Mobile menu (ONLY pages + close button) -->
   <div class="mobileMenu" id="mobileMenu" aria-hidden="true">
     <div class="mobileMenu__panel">
       <div class="mobileMenu__top">
         <span class="mobileMenu__title">Pages</span>
-        <button class="mobileClose" id="closeMenu" type="button" aria-label="Close">✕</button>
+        <button class="mobileClose" id="closeMenu" type="button" aria-label="Close">x</button>
       </div>
 
       <div class="mobileMenu__links">
-        <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('about') }}">About</a>
-        <a href="{{ url_for('services') }}">Services</a>
+        <a href="{{ url_for('pages.index') }}">Home</a>
+        <a href="{{ url_for('pages.about') }}">About</a>
+        <a href="{{ url_for('pages.services') }}">Services</a>
+        <a href="{{ url_for('pages.quote') }}">Quote</a>
+        <a href="{{ url_for('pages.projects') }}">Projects</a>
 
         {% if current_user %}
-          <a href="{{ url_for('dashboard') }}">Dashboard</a>
-          <a href="{{ url_for('profile') }}">Profile</a>
-          <a href="{{ url_for('logout') }}">Logout</a>
+          <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
+          {% if current_user.is_admin %}
+            <a href="{{ url_for('admin.admin_dashboard') }}">Admin</a>
+          {% endif %}
+          <a href="{{ url_for('user.profile') }}">Profile</a>
+          <a href="{{ url_for('settings.settings') }}">Settings</a>
+          <a href="{{ url_for('auth.logout') }}">Logout</a>
         {% else %}
-          <a href="{{ url_for('login') }}">Login</a>
-          <a href="{{ url_for('signup') }}">Sign up</a>
+          <a href="{{ url_for('auth.login') }}">Login</a>
+          <a href="{{ url_for('auth.signup') }}">Sign up</a>
         {% endif %}
       </div>
     </div>
@@ -128,35 +153,40 @@
     <div class="footer__col">
       <div class="footer__brand">
         <span class="brand__dot" aria-hidden="true"></span>
-        <strong>Ahmed</strong>
+        <strong>{{ brand_name }}</strong>
       </div>
-      <p class="muted">Personal portfolio website.</p>
+      <p class="muted">Personal portfolio website for Flask, backend, and automation work.</p>
     </div>
 
     <div class="footer__col">
       <strong class="footer__title">Links</strong>
       <div class="footer__links">
-        <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('about') }}">About</a>
-        <a href="{{ url_for('services') }}">Services</a>
+        <a href="{{ url_for('pages.index') }}">Home</a>
+        <a href="{{ url_for('pages.about') }}">About</a>
+        <a href="{{ url_for('pages.services') }}">Services</a>
+        <a href="{{ url_for('pages.quote') }}">Quote</a>
+        <a href="{{ url_for('pages.projects') }}">Projects</a>
       </div>
     </div>
 
     <div class="footer__col">
-      <strong class="footer__title">Social</strong>
+      <strong class="footer__title">Contact</strong>
       <div class="footer__social">
-        <a class="socialBtn" href="#" aria-label="YouTube">
-          <img src="{{ url_for('static', filename='assets/youtube.png') }}" alt="YouTube">
+        <a class="socialBtn socialBtn--github" href="{{ github_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ brand_name }} on GitHub">
+          <img src="{{ url_for('static', filename='assets/github.svg') }}" alt="">
         </a>
-        <a class="socialBtn" href="#" aria-label="Facebook">
-          <img src="{{ url_for('static', filename='assets/facebook.png') }}" alt="Facebook">
+        <a class="socialBtn socialBtn--youtube" href="{{ youtube_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ brand_name }} on YouTube">
+          <img src="{{ url_for('static', filename='assets/youtube.svg') }}" alt="">
+        </a>
+        <a class="socialBtn" href="{{ contact_url }}" target="_blank" rel="noopener noreferrer" aria-label="Email Ahmed">
+          <img src="{{ url_for('static', filename='assets/search.png') }}" alt="Email">
         </a>
       </div>
     </div>
   </div>
 
   <div class="container footer__bottom">
-    <span class="muted small">© <span id="year"></span> Ahmed</span>
+    <span class="muted small">&copy; <span id="year"></span> {{ brand_name }}</span>
   </div>
 </footer>
 

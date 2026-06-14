@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request, session
+from models.user_model import find_user_by_id
 from utils.decorators import login_required
 from services.theme_service import save_theme
 
@@ -7,7 +8,8 @@ settings_bp = Blueprint("settings", __name__)
 @settings_bp.get("/settings")
 @login_required
 def settings():
-    return render_template("settings.html")
+    user = find_user_by_id(session["user_id"])
+    return render_template("settings.html", theme=user["theme"] if user else "system")
 
 @settings_bp.post("/api/theme")
 @login_required

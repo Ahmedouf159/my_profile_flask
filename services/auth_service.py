@@ -11,7 +11,7 @@ def signup_user(username: str, email: str, password: str, confirm: str):
         return False, "Please fill all fields."
 
     if not is_valid_username(username):
-        return False, "Username must be at least 3 characters."
+        return False, "Username must be 3-30 characters and use only letters, numbers, or underscores."
 
     if not is_valid_email(email):
         return False, "Please enter a valid email."

@@ -6,7 +6,7 @@
   <div class="container">
     <div class="sectionHead" data-reveal>
       <h2>Profile</h2>
-      <p class="muted">This is your account info. You can change username.</p>
+      <p class="muted">Manage your account details and password.</p>
     </div>
 
     <div class="cards2">
@@ -14,15 +14,34 @@
         <h3>Account details</h3>
         <p><strong>Username:</strong> {{ current_user.username }}</p>
         <p><strong>Email:</strong> {{ current_user.email }}</p>
-        <p class="muted small">Avatar letter in header = first letter of username (lowercase).</p>
+        <p class="muted small">Avatar letter in header = first letter of username.</p>
       </div>
 
       <div class="card" data-reveal>
-        <h3>Edit username</h3>
+        <h3>Edit account</h3>
         <form method="POST" class="form">
-          <label class="label">New username</label>
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+
+          <label class="label">Username</label>
           <input class="input" name="username" value="{{ current_user.username }}" required>
-          <button class="btn btn--primary" type="submit">Save</button>
+
+          <label class="label">New password</label>
+          <div class="password-wrap">
+            <input type="password" id="new_password" name="new_password" placeholder="Leave blank to keep current password">
+            <button type="button" class="toggle-pass" data-target="new_password" aria-label="Show password">
+              Show
+            </button>
+          </div>
+
+          <label class="label">Confirm new password</label>
+          <div class="password-wrap">
+            <input type="password" id="confirm_new_password" name="confirm_new_password" placeholder="Confirm new password">
+            <button type="button" class="toggle-pass" data-target="confirm_new_password" aria-label="Show password">
+              Show
+            </button>
+          </div>
+
+          <button class="btn btn--primary" type="submit">Save changes</button>
         </form>
       </div>
     </div>
