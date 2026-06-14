@@ -23,7 +23,7 @@ def login(client, identity="ahmed", password="password123"):
 
 
 def test_public_pages_load(client):
-    for path in ["/", "/about", "/services", "/quote", "/projects"]:
+    for path in ["/", "/about", "/services", "/pricing", "/quote", "/projects", "/testimonials", "/case-studies"]:
         response = client.get(path)
         assert response.status_code == 200
 
@@ -96,6 +96,16 @@ def test_projects_page_reads_like_case_studies(client):
     assert "https://www.youtube.com/channel/UCT0xlDQpWRaoBcnQccRV7HA" in text
 
 
+def test_case_study_detail_page_loads(client):
+    response = client.get("/case-studies/smart-quote-builder")
+    text = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert "Smart Quote Builder" in text
+    assert "Challenge" in text
+    assert "Solution" in text
+
+
 def test_quote_builder_page_renders(client):
     response = client.get("/quote")
     text = response.get_data(as_text=True)
@@ -103,6 +113,7 @@ def test_quote_builder_page_renders(client):
     assert response.status_code == 200
     assert "Project Quote Builder" in text
     assert "Email Ahmed This Quote" in text
+    assert "Save To Client Portal" in text
     assert "Download Proposal PDF" in text
     assert "ML Success Prediction" in text
     assert "Build Roadmap" in text
@@ -149,6 +160,73 @@ def test_project_prediction_api_returns_ml_result(client):
     assert prediction["advice"]
 
 
+def test_logged_in_user_can_save_quote_to_client_portal(client):
+    signup(client)
+    login(client)
+
+    prediction_response = client.post(
+        "/api/project-prediction",
+        json={
+            "projectType": "dashboard",
+            "pages": 5,
+            "deadline": "normal",
+            "budget": "high",
+            "features": ["auth", "admin", "database"],
+        },
+    )
+    prediction_id = prediction_response.get_json()["prediction_id"]
+
+    save_response = client.post("/api/quotes/save", json={"prediction_id": prediction_id})
+    assert save_response.status_code == 200
+    assert save_response.get_json() == {"ok": True, "message": "Quote saved to your client portal."}
+
+    dashboard = client.get("/dashboard")
+    text = dashboard.get_data(as_text=True)
+    assert "Saved Quotes" in text
+    assert "Project Tracker" in text
+    assert "Quote saved to your portal" in text
+    assert "Dashboard" in text
+
+
+def test_project_room_messages_files_and_approval(client):
+    signup(client)
+    login(client)
+
+    prediction_response = client.post(
+        "/api/project-prediction",
+        json={
+            "projectType": "business",
+            "pages": 3,
+            "deadline": "normal",
+            "budget": "medium",
+            "features": ["contact", "database"],
+        },
+    )
+    prediction_id = prediction_response.get_json()["prediction_id"]
+    client.post("/api/quotes/save", json={"prediction_id": prediction_id})
+
+    dashboard = client.get("/dashboard")
+    text = dashboard.get_data(as_text=True)
+    assert "Open Project Room" in text
+
+    room = client.get("/dashboard/projects/1")
+    assert room.status_code == 200
+    assert "Milestones" in room.get_data(as_text=True)
+
+    client.post("/dashboard/projects/1/message", data={"body": "I need a booking section."})
+    client.post(
+        "/dashboard/projects/1/file",
+        data={"label": "Brand logo", "file_url": "https://example.com/logo.png"},
+    )
+    client.post("/dashboard/projects/1/approve", follow_redirects=True)
+
+    room = client.get("/dashboard/projects/1")
+    text = room.get_data(as_text=True)
+    assert "I need a booking section." in text
+    assert "Brand logo" in text
+    assert "Proposal Approved" in text
+
+
 def test_admin_panel_requires_login(client):
     response = client.get("/admin", follow_redirects=True)
     text = response.get_data(as_text=True)
@@ -178,6 +256,7 @@ def test_admin_panel_shows_ml_charts_and_recent_predictions(client):
 
     assert response.status_code == 200
     assert "Admin Panel" in text
+    assert "Lead CRM" in text
     assert "Project Types" in text
     assert "Risk Levels" in text
     assert "Recent ML Predictions" in text
@@ -215,7 +294,7 @@ def test_social_auth_buttons_render_with_setup_state(client):
     assert "/auth/facebook" in text
     assert "Google" in text
     assert "Facebook" in text
-    assert "Install Authlib" in text or "Add OAuth client IDs" in text
+    assert "Install Authlib" in text or "Add the Google OAuth client ID and secret" in text
 
 
 def test_unconfigured_social_login_redirects_to_login(client):
@@ -225,6 +304,30 @@ def test_unconfigured_social_login_redirects_to_login(client):
     assert response.status_code == 200
     assert "Google login is not configured yet" in text
     assert "Welcome back" in text
+
+
+def test_malformed_google_oauth_config_is_not_enabled(tmp_path):
+    database = tmp_path / "oauth.db"
+    app = create_app(
+        {
+            "TESTING": True,
+            "DATABASE": str(database),
+            "SECRET_KEY": "test-secret",
+            "CSRF_ENABLED": False,
+            "GOOGLE_CLIENT_ID": "not-a-google-client-id",
+            "GOOGLE_CLIENT_SECRET": "not-a-google-secret",
+            "FACEBOOK_CLIENT_ID": "",
+            "FACEBOOK_CLIENT_SECRET": "",
+        }
+    )
+
+    client = app.test_client()
+    response = client.get("/login")
+    text = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert 'aria-disabled="true"' in text
+    assert "Google OAuth client ID format looks wrong." in text
 
 
 def test_signup_login_logout_flow(client):
@@ -322,6 +425,33 @@ def test_secret_offer_rejects_invalid_code(client):
 
     assert response.status_code == 400
     assert response.get_json() == {"ok": False, "error": "Invalid secret code."}
+
+
+def test_first_time_user_dashboard_shows_onboarding(client):
+    signup(client)
+    login(client)
+
+    response = client.get("/dashboard")
+    text = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert 'id="onboardingTour"' in text
+    assert 'data-onboarding="pending"' in text
+    assert "First time setup" in text
+
+
+def test_user_can_complete_onboarding(client):
+    signup(client)
+    login(client)
+
+    response = client.post("/api/onboarding/complete", json={})
+    assert response.status_code == 200
+    assert response.get_json() == {"ok": True}
+
+    response = client.get("/dashboard")
+    text = response.get_data(as_text=True)
+    assert 'id="onboardingTour"' not in text
+    assert 'data-onboarding="done"' in text
 
 
 def test_csrf_blocks_missing_token(tmp_path):

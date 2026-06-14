@@ -165,6 +165,113 @@
     });
   }
 
+  // FIRST-TIME DASHBOARD TOUR
+  const tour = document.getElementById("onboardingTour");
+  const tourTitle = document.getElementById("onboardingTitle");
+  const tourBody = document.getElementById("onboardingBody");
+  const tourCount = document.getElementById("onboardingCount");
+  const tourBar = document.getElementById("onboardingBar");
+  const tourBack = document.getElementById("onboardingBack");
+  const tourNext = document.getElementById("onboardingNext");
+  const tourSteps = [
+    {
+      target: "overview",
+      title: "Welcome to your dashboard",
+      body: "This is your home base after signup. You can return here to manage your account, find quick links, and unlock private website features.",
+    },
+    {
+      target: "stats",
+      title: "Quick profile summary",
+      body: "These cards show a fast snapshot of the portfolio: projects, core skills, and active status.",
+    },
+    {
+      target: "links",
+      title: "Move around faster",
+      body: "Quick links help you jump to public pages, settings, profile, and admin tools when your account has access.",
+    },
+    {
+      target: "offer",
+      title: "Private offer area",
+      body: "Use the secret code feature to reveal a special package price. This is a demo of protected user-only functionality.",
+    },
+    {
+      target: "actions",
+      title: "Account actions",
+      body: "Use these buttons to update your profile, open admin tools, or return to the project showcase.",
+    },
+  ];
+  let tourIndex = 0;
+
+  function clearTourFocus() {
+    document.querySelectorAll(".tourFocus").forEach((node) => node.classList.remove("tourFocus"));
+  }
+
+  async function completeTour() {
+    clearTourFocus();
+    if (tour) {
+      tour.classList.remove("isOpen");
+      tour.setAttribute("aria-hidden", "true");
+    }
+    document.body.style.overflow = "";
+
+    await fetch("/api/onboarding/complete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken || "",
+      },
+      body: "{}",
+    }).catch(() => {});
+  }
+
+  function renderTourStep() {
+    if (!tour || !tourTitle || !tourBody || !tourCount || !tourBar || !tourBack || !tourNext) return;
+    const step = tourSteps[tourIndex];
+    clearTourFocus();
+
+    const target = document.querySelector(`[data-tour-target="${step.target}"]`);
+    if (target) {
+      target.classList.add("tourFocus");
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    tourTitle.textContent = step.title;
+    tourBody.textContent = step.body;
+    tourCount.textContent = `${tourIndex + 1} of ${tourSteps.length}`;
+    tourBar.style.width = `${((tourIndex + 1) / tourSteps.length) * 100}%`;
+    tourBack.disabled = tourIndex === 0;
+    tourNext.textContent = tourIndex === tourSteps.length - 1 ? "Finish" : "Next";
+  }
+
+  if (tour) {
+    window.setTimeout(() => {
+      tour.classList.add("isOpen");
+      tour.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      renderTourStep();
+    }, 450);
+
+    if (tourBack) {
+      tourBack.addEventListener("click", () => {
+        tourIndex = Math.max(0, tourIndex - 1);
+        renderTourStep();
+      });
+    }
+    if (tourNext) {
+      tourNext.addEventListener("click", () => {
+        if (tourIndex >= tourSteps.length - 1) {
+          completeTour();
+          return;
+        }
+        tourIndex += 1;
+        renderTourStep();
+      });
+    }
+    tour.querySelectorAll("[data-tour-close]").forEach((button) => {
+      button.addEventListener("click", completeTour);
+    });
+  }
+
   // PROJECT QUOTE BUILDER
   const quoteForm = document.getElementById("quoteForm");
   const quotePrice = document.getElementById("quotePrice");
@@ -177,6 +284,8 @@
   const quoteBudget = document.getElementById("quoteBudget");
   const proposalDownload = document.getElementById("proposalDownload");
   const mlPredict = document.getElementById("mlPredict");
+  const saveQuote = document.getElementById("saveQuote");
+  const saveQuoteStatus = document.getElementById("saveQuoteStatus");
   const mlSuccessScore = document.getElementById("mlSuccessScore");
   const mlPackage = document.getElementById("mlPackage");
   const mlRisk = document.getElementById("mlRisk");
@@ -186,6 +295,7 @@
   const roadmapTimeline = document.getElementById("roadmapTimeline");
   const roadmapChecklist = document.getElementById("roadmapChecklist");
   let latestMlPrediction = null;
+  let latestPredictionId = null;
   let mlTimer = null;
 
   const quoteTypes = {
@@ -536,20 +646,56 @@
       if (!payload.ok) throw new Error("Prediction failed");
 
       latestMlPrediction = payload.prediction;
+      latestPredictionId = payload.prediction_id;
       mlSuccessScore.textContent = latestMlPrediction.success_score;
       mlPackage.textContent = latestMlPrediction.package;
       mlRisk.textContent = latestMlPrediction.risk;
       mlModel.textContent = latestMlPrediction.model_engine;
       mlAdvice.innerHTML = latestMlPrediction.advice.map((item) => `<li>${item}</li>`).join("");
+      if (saveQuoteStatus) saveQuoteStatus.textContent = "";
       updateQuote();
     } catch (_error) {
       latestMlPrediction = null;
+      latestPredictionId = null;
       mlSuccessScore.textContent = "--";
       mlPackage.textContent = "Unavailable";
       mlRisk.textContent = "--";
       mlModel.textContent = "Could not run ML prediction.";
       mlAdvice.innerHTML = "<li>Try again after restarting the Flask server.</li>";
       updateQuote();
+    }
+  }
+
+  async function saveCurrentQuote() {
+    if (!saveQuote || !saveQuoteStatus) return;
+    if (saveQuote.dataset.authenticated !== "true") {
+      saveQuoteStatus.textContent = "Login first to save this quote.";
+      window.location.href = saveQuote.dataset.loginUrl || "/login";
+      return;
+    }
+    if (!latestPredictionId) {
+      saveQuoteStatus.textContent = "Run the ML prediction first.";
+      return;
+    }
+
+    saveQuote.disabled = true;
+    saveQuoteStatus.textContent = "Saving quote...";
+    try {
+      const response = await fetch("/api/quotes/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken || "",
+        },
+        body: JSON.stringify({ prediction_id: latestPredictionId }),
+      });
+      const payload = await response.json();
+      if (!payload.ok) throw new Error(payload.error || "Could not save quote.");
+      saveQuoteStatus.textContent = payload.message || "Quote saved.";
+    } catch (error) {
+      saveQuoteStatus.textContent = error.message || "Could not save quote.";
+    } finally {
+      saveQuote.disabled = false;
     }
   }
 
@@ -572,6 +718,7 @@
       });
     }
     if (mlPredict) mlPredict.addEventListener("click", runMlPrediction);
+    if (saveQuote) saveQuote.addEventListener("click", saveCurrentQuote);
     updateQuote();
     runMlPrediction();
   }

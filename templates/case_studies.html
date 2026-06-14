@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% set title = "Case Studies" %}
+{% block content %}
+<section class="pageTop">
+  <div class="container">
+    <h1 class="pageTitle">Case Studies</h1>
+    <p class="pageSub">Project stories showing challenge, solution, result, and stack.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="cards">
+    {% for item in case_studies %}
+      <article class="project-card">
+        <span class="badge">{{ item.stack }}</span>
+        <h2>{{ item.title }}</h2>
+        <p>{{ item.result }}</p>
+        <a class="btn btn--primary" href="{{ url_for('pages.case_study_detail', slug=item.slug) }}">Read Case Study</a>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

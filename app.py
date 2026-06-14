@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 from dotenv import load_dotenv
 from flask import Flask, Response, abort, flash, jsonify, redirect, render_template, request, session, url_for
 
-load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"), override=True)
 
 from config import settings
 from models.db import init_db
@@ -72,6 +72,7 @@ def _install_template_context(app: Flask) -> None:
                     "email": row["email"],
                     "theme": row["theme"],
                     "is_admin": bool(row["is_admin"]),
+                    "onboarding_seen": bool(row["onboarding_seen"]),
                 }
 
         contact_email = app.config["CONTACT_EMAIL"]
@@ -158,8 +159,11 @@ def create_app(test_config: dict | None = None) -> Flask:
             url_for("pages.index"),
             url_for("pages.about"),
             url_for("pages.services"),
+            url_for("pages.pricing"),
             url_for("pages.quote"),
             url_for("pages.projects"),
+            url_for("pages.case_studies"),
+            url_for("pages.testimonials"),
             url_for("auth.login"),
             url_for("auth.signup"),
         ]

@@ -171,6 +171,16 @@
 
       <div class="quoteActions">
         <button class="btn btn--ghost w100" id="mlPredict" type="button">Run ML Prediction</button>
+        <button
+          class="btn btn--primary w100"
+          id="saveQuote"
+          type="button"
+          data-authenticated="{{ 'true' if current_user else 'false' }}"
+          data-login-url="{{ url_for('auth.login') }}"
+        >
+          Save To Client Portal
+        </button>
+        <p class="inline-help center" id="saveQuoteStatus" aria-live="polite"></p>
         <a class="btn btn--ghost w100" id="proposalDownload" target="_blank" rel="noopener noreferrer" href="{{ url_for('pages.quote_proposal_pdf') }}">
           Download Proposal PDF
         </a>

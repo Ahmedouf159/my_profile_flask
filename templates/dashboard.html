@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 
-<section class="dashWrap">
-  <div class="dashTop">
+<section class="dashWrap" data-onboarding="{{ 'pending' if not current_user.onboarding_seen else 'done' }}">
+  <div class="dashTop" data-tour-target="overview">
     <div>
       <h1 class="dashH1">Dashboard</h1>
       <p class="dashSub muted">
@@ -10,7 +10,7 @@
       </p>
     </div>
 
-    <div class="dashActions">
+    <div class="dashActions" data-tour-target="actions">
       <a class="btn btn--ghost" href="{{ url_for('user.profile') }}">Profile</a>
       {% if current_user.is_admin %}
         <a class="btn btn--ghost" href="{{ url_for('admin.admin_dashboard') }}">Admin Panel</a>
@@ -19,37 +19,113 @@
     </div>
   </div>
 
-  <div class="dashGrid">
+  <div class="dashGrid" data-tour-target="stats">
     <div class="dashCard">
       <div class="dashCard__top">
-        <span class="dashIconBadge">13+</span>
-        <span class="dashLabel muted">Projects</span>
+        <span class="dashIconBadge">QS</span>
+        <span class="dashLabel muted">Saved Quotes</span>
       </div>
-      <div class="dashValue">13+</div>
-      <div class="dashHint muted small">Real apps and tools built since 2024</div>
+      <div class="dashValue">{{ portal_stats.saved_quotes }}</div>
+      <div class="dashHint muted small">{{ portal_stats.total_predictions }} ML estimates created</div>
     </div>
 
     <div class="dashCard">
       <div class="dashCard__top">
-        <span class="dashIconBadge">PY</span>
-        <span class="dashLabel muted">Skills</span>
+        <span class="dashIconBadge">PR</span>
+        <span class="dashLabel muted">Client Projects</span>
       </div>
-      <div class="dashValue">Python | Flask</div>
-      <div class="dashHint muted small">SQL | HTML | CSS | JavaScript</div>
+      <div class="dashValue">{{ portal_stats.projects }}</div>
+      <div class="dashHint muted small">Tracked from saved project quotes</div>
     </div>
 
     <div class="dashCard">
       <div class="dashCard__top">
-        <span class="dashIconBadge">OK</span>
-        <span class="dashLabel muted">Status</span>
+        <span class="dashIconBadge">AI</span>
+        <span class="dashLabel muted">Best Lead Score</span>
       </div>
-      <div class="dashValue">Active</div>
-      <div class="dashHint muted small">Learning and shipping updates weekly</div>
+      <div class="dashValue">{{ portal_stats.best_score }}/100</div>
+      <div class="dashHint muted small">{{ portal_stats.unread }} unread notifications</div>
+    </div>
+  </div>
+
+  <div class="portalGrid">
+    <div class="dashPanel portalPanel">
+      <div class="dashPanel__head">
+        <h2 class="dashH2">Saved Quotes</h2>
+        <span class="muted small">Client portal</span>
+      </div>
+
+      {% if saved_quotes %}
+        <div class="portalList">
+          {% for quote in saved_quotes %}
+            <article class="portalItem">
+              <div>
+                <strong>{{ quote.project_type | title }} {{ quote.package }}</strong>
+                <p class="muted small">${{ quote.price_min }} - ${{ quote.price_max }} / {{ quote.days_min }} - {{ quote.days_max }} days</p>
+              </div>
+              <span class="riskBadge riskBadge--{{ quote.risk | lower }}">{{ quote.risk }}</span>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="notice warning">No saved quotes yet. Open the Quote Builder, run ML prediction, then save it here.</div>
+      {% endif %}
+    </div>
+
+    <div class="dashPanel portalPanel">
+      <div class="dashPanel__head">
+        <h2 class="dashH2">Project Tracker</h2>
+        <span class="muted small">Timeline</span>
+      </div>
+
+      {% if client_projects %}
+        <div class="portalList">
+          {% for project in client_projects %}
+            <article class="portalItem portalItem--stack">
+              <div class="portalItem__top">
+                <strong>{{ project.title }}</strong>
+                <span class="statusPill">{{ project.status }}</span>
+              </div>
+              <p class="muted small">{{ project.summary }}</p>
+              <div class="miniTimeline">
+                <span class="done">Brief</span>
+                <span class="{{ 'done' if project.status != 'Discovery' else '' }}">Plan</span>
+                <span>Build</span>
+                <span>Deliver</span>
+              </div>
+              <p class="inline-help">Next: {{ project.next_step }}</p>
+              <a class="btn btn--ghost w100" href="{{ url_for('user.project_room', project_id=project.id) }}">Open Project Room</a>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="notice warning">Save a quote to create your first tracked project.</div>
+      {% endif %}
+    </div>
+
+    <div class="dashPanel portalPanel">
+      <div class="dashPanel__head">
+        <h2 class="dashH2">Notifications</h2>
+        <span class="muted small">Updates</span>
+      </div>
+
+      {% if notifications %}
+        <div class="portalList">
+          {% for notification in notifications %}
+            <article class="portalItem portalItem--stack">
+              <strong>{{ notification.title }}</strong>
+              <p class="muted small">{{ notification.body }}</p>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="notice">No notifications yet.</div>
+      {% endif %}
     </div>
   </div>
 
   <div class="dashPanels">
-    <div class="dashPanel">
+    <div class="dashPanel" data-tour-target="links">
       <div class="dashPanel__head">
         <h2 class="dashH2">Quick Links</h2>
         <span class="muted small">Fast navigation</span>
@@ -79,7 +155,7 @@
       </div>
     </div>
 
-    <div class="dashPanel secretOffer">
+    <div class="dashPanel secretOffer" data-tour-target="offer">
       <div class="dashPanel__head">
         <h2 class="dashH2">Secret Offer</h2>
         <span class="muted small">Enter the private code</span>
@@ -116,5 +192,31 @@
     </div>
   </div>
 </section>
+
+{% if not current_user.onboarding_seen %}
+  <div class="onboarding" id="onboardingTour" aria-hidden="true">
+    <div class="onboarding__shade" data-tour-close></div>
+    <section class="onboarding__panel" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
+      <div class="onboarding__top">
+        <span class="onboarding__eyebrow">First time setup</span>
+        <button class="onboarding__close" type="button" data-tour-close aria-label="Close tour">x</button>
+      </div>
+      <h2 id="onboardingTitle">Welcome to your dashboard</h2>
+      <p class="onboarding__body" id="onboardingBody">
+        Start here to understand the main tools in your account.
+      </p>
+      <div class="onboarding__progress" aria-hidden="true">
+        <span class="onboarding__bar" id="onboardingBar"></span>
+      </div>
+      <div class="onboarding__meta">
+        <span id="onboardingCount">1 of 5</span>
+      </div>
+      <div class="onboarding__actions">
+        <button class="btn btn--ghost" type="button" id="onboardingBack">Back</button>
+        <button class="btn btn--primary" type="button" id="onboardingNext">Next</button>
+      </div>
+    </section>
+  </div>
+{% endif %}
 
 {% endblock %}

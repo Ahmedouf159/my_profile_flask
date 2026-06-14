@@ -23,6 +23,10 @@
 
   {% if social_login.google.missing_dependency or social_login.facebook.missing_dependency %}
     <p class="inline-help center">Install Authlib to activate social login.</p>
+  {% elif social_login.google.message or social_login.facebook.message %}
+    <p class="inline-help center">
+      {{ social_login.google.message or social_login.facebook.message }}
+    </p>
   {% elif social_login.google.configured and not social_login.facebook.configured %}
     <p class="inline-help center">Google is ready. Add Facebook credentials later if you need it.</p>
   {% elif not social_login.google.configured and social_login.facebook.configured %}

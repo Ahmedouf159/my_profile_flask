@@ -43,8 +43,10 @@
       <a class="nav__link" href="{{ url_for('pages.index') }}">Home</a>
       <a class="nav__link" href="{{ url_for('pages.about') }}">About</a>
       <a class="nav__link" href="{{ url_for('pages.services') }}">Services</a>
+      <a class="nav__link" href="{{ url_for('pages.pricing') }}">Pricing</a>
       <a class="nav__link" href="{{ url_for('pages.quote') }}">Quote</a>
       <a class="nav__link" href="{{ url_for('pages.projects') }}">Projects</a>
+      <a class="nav__link" href="{{ url_for('pages.case_studies') }}">Cases</a>
       {% if current_user %}
         <a class="nav__link" href="{{ url_for('user.dashboard') }}">Dashboard</a>
         {% if current_user.is_admin %}
@@ -112,8 +114,10 @@
         <a href="{{ url_for('pages.index') }}">Home</a>
         <a href="{{ url_for('pages.about') }}">About</a>
         <a href="{{ url_for('pages.services') }}">Services</a>
+        <a href="{{ url_for('pages.pricing') }}">Pricing</a>
         <a href="{{ url_for('pages.quote') }}">Quote</a>
         <a href="{{ url_for('pages.projects') }}">Projects</a>
+        <a href="{{ url_for('pages.case_studies') }}">Cases</a>
 
         {% if current_user %}
           <a href="{{ url_for('user.dashboard') }}">Dashboard</a>
@@ -164,8 +168,10 @@
         <a href="{{ url_for('pages.index') }}">Home</a>
         <a href="{{ url_for('pages.about') }}">About</a>
         <a href="{{ url_for('pages.services') }}">Services</a>
+        <a href="{{ url_for('pages.pricing') }}">Pricing</a>
         <a href="{{ url_for('pages.quote') }}">Quote</a>
         <a href="{{ url_for('pages.projects') }}">Projects</a>
+        <a href="{{ url_for('pages.testimonials') }}">Testimonials</a>
       </div>
     </div>
 

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% set title = "Testimonials" %}
+{% block content %}
+<section class="pageTop">
+  <div class="container">
+    <h1 class="pageTitle">Testimonials</h1>
+    <p class="pageSub">Demo client feedback for the portfolio and client portal workflow.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="cards">
+    {% for item in testimonials %}
+      <article class="card">
+        <span class="badge">{{ item.rating }}/5</span>
+        <p class="big-paragraph">"{{ item.quote }}"</p>
+        <strong>{{ item.client_name }}</strong>
+        <p class="muted small">{{ item.role }}</p>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

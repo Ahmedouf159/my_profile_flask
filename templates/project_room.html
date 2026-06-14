@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% set title = "Project Room" %}
+{% block content %}
+
+<section class="dashWrap projectRoom">
+  <div class="dashTop">
+    <div>
+      <h1 class="dashH1">{{ project.title }}</h1>
+      <p class="dashSub muted">{{ project.summary }}</p>
+    </div>
+    <div class="dashActions">
+      <span class="statusPill">{{ project.status }}</span>
+      {% if admin_view %}
+        <a class="btn btn--ghost" href="{{ url_for('admin.admin_dashboard') }}">Admin</a>
+      {% else %}
+        <a class="btn btn--ghost" href="{{ url_for('user.dashboard') }}">Dashboard</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="portalGrid">
+    <section class="dashPanel">
+      <div class="dashPanel__head">
+        <h2 class="dashH2">Milestones</h2>
+        <span class="muted small">Proposal and delivery</span>
+      </div>
+      <div class="portalList">
+        {% for milestone in room.milestones %}
+          <article class="portalItem">
+            <strong>{{ milestone.title }}</strong>
+            <span class="statusPill">{{ milestone.status | title }}</span>
+          </article>
+        {% endfor %}
+      </div>
+      {% if not admin_view and project.status != "Proposal Approved" %}
+        <form method="POST" action="{{ url_for('user.project_approve', project_id=project.id) }}">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn--primary w100" type="submit">Approve Proposal</button>
+        </form>
+      {% endif %}
+    </section>
+
+    <section class="dashPanel">
+      <div class="dashPanel__head">
+        <h2 class="dashH2">Messages</h2>
+        <span class="muted small">Client and admin thread</span>
+      </div>
+      <div class="messageThread">
+        {% for message in room.messages %}
+          <article class="messageBubble {{ 'messageBubble--admin' if message.is_admin else '' }}">
+            <strong>{{ message.username }}</strong>
+            <p>{{ message.body }}</p>
+          </article>
+        {% else %}
+          <div class="notice">No messages yet.</div>
+        {% endfor %}
+      </div>
+      <form class="form" method="POST" action="{{ url_for('admin.admin_project_message' if admin_view else 'user.project_message', project_id=project.id) }}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <textarea class="input" name="body" rows="3" placeholder="Write a message..." required></textarea>
+        <button class="btn btn--primary w100" type="submit">Send Message</button>
+      </form>
+    </section>
+
+    <section class="dashPanel">
+      <div class="dashPanel__head">
+        <h2 class="dashH2">Files</h2>
+        <span class="muted small">Links and assets</span>
+      </div>
+      <div class="portalList">
+        {% for file in room.files %}
+          <a class="portalItem" href="{{ file.file_url }}" target="_blank" rel="noopener noreferrer">
+            <strong>{{ file.label }}</strong>
+            <span class="muted small">Open</span>
+          </a>
+        {% else %}
+          <div class="notice">No files added yet.</div>
+        {% endfor %}
+      </div>
+      {% if not admin_view %}
+        <form class="form" method="POST" action="{{ url_for('user.project_file', project_id=project.id) }}">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          <input class="input" name="label" placeholder="File label" required>
+          <input class="input" name="file_url" placeholder="https://..." required>
+          <button class="btn btn--ghost w100" type="submit">Add File Link</button>
+        </form>
+      {% endif %}
+    </section>
+  </div>
+</section>
+
+{% endblock %}

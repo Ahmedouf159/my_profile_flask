@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% set title = "Pricing" %}
+{% block content %}
+<section class="pageTop">
+  <div class="container">
+    <h1 class="pageTitle">Pricing Packages</h1>
+    <p class="pageSub">Clear starting packages for websites, dashboards, portals, and automation work.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="cards">
+    {% for package in packages %}
+      <article class="card">
+        <span class="badge">{{ package.price }}</span>
+        <h2>{{ package.name }}</h2>
+        <p class="muted">{{ package.fit }}</p>
+        <ul class="dashList">
+          {% for feature in package.features %}
+            <li>{{ feature }}</li>
+          {% endfor %}
+        </ul>
+        <a class="btn btn--primary w100" href="{{ url_for('pages.quote') }}">Build Quote</a>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,3 +1,4 @@
+import re
 import secrets
 
 from werkzeug.security import generate_password_hash
@@ -19,6 +20,10 @@ except ImportError:
 
 
 PROVIDERS = ("google", "facebook")
+GOOGLE_CLIENT_ID_PATTERN = re.compile(r"^\d+-[A-Za-z0-9_-]+\.apps\.googleusercontent\.com$")
+GOOGLE_CLIENT_SECRET_PATTERN = re.compile(r"^GOCSPX-[A-Za-z0-9_-]+$")
+FACEBOOK_CLIENT_ID_PATTERN = re.compile(r"^\d+$")
+FACEBOOK_CLIENT_SECRET_PATTERN = re.compile(r"^[A-Fa-f0-9]{32}$")
 
 
 def init_oauth(app):
@@ -52,11 +57,33 @@ def init_oauth(app):
 
 
 def is_provider_configured(app, provider: str) -> bool:
+    return oauth_config_issue(app, provider) is None
+
+
+def oauth_config_issue(app, provider: str) -> str | None:
     if provider == "google":
-        return bool(app.config.get("GOOGLE_CLIENT_ID") and app.config.get("GOOGLE_CLIENT_SECRET"))
+        client_id = app.config.get("GOOGLE_CLIENT_ID", "")
+        client_secret = app.config.get("GOOGLE_CLIENT_SECRET", "")
+        if not client_id or not client_secret:
+            return "Add the Google OAuth client ID and secret."
+        if not GOOGLE_CLIENT_ID_PATTERN.match(client_id):
+            return "Google OAuth client ID format looks wrong."
+        if not GOOGLE_CLIENT_SECRET_PATTERN.match(client_secret):
+            return "Google OAuth client secret format looks wrong."
+        return None
+
     if provider == "facebook":
-        return bool(app.config.get("FACEBOOK_CLIENT_ID") and app.config.get("FACEBOOK_CLIENT_SECRET"))
-    return False
+        client_id = app.config.get("FACEBOOK_CLIENT_ID", "")
+        client_secret = app.config.get("FACEBOOK_CLIENT_SECRET", "")
+        if not client_id or not client_secret:
+            return "Add the Facebook app ID and app secret."
+        if not FACEBOOK_CLIENT_ID_PATTERN.match(client_id):
+            return "Facebook app ID format looks wrong."
+        if not FACEBOOK_CLIENT_SECRET_PATTERN.match(client_secret):
+            return "Facebook app secret format looks wrong."
+        return None
+
+    return "Unknown social login provider."
 
 
 def social_login_status(app):
@@ -65,6 +92,7 @@ def social_login_status(app):
         provider: {
             "configured": available and is_provider_configured(app, provider),
             "missing_dependency": not available,
+            "message": oauth_config_issue(app, provider),
         }
         for provider in PROVIDERS
     }

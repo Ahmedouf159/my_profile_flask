@@ -40,11 +40,11 @@
   <div class="dashGrid adminStats">
     <div class="dashCard">
       <div class="dashCard__top">
-        <span class="dashIconBadge">ML</span>
-        <span class="dashLabel muted">Predictions</span>
+        <span class="dashIconBadge">LD</span>
+        <span class="dashLabel muted">Active Leads</span>
       </div>
-      <div class="dashValue">{{ stats.total }}</div>
-      <div class="dashHint muted small">Saved quote predictions</div>
+      <div class="dashValue">{{ stats.active_leads }}</div>
+      <div class="dashHint muted small">{{ stats.saved }} saved to client portals</div>
     </div>
 
     <div class="dashCard">
@@ -64,6 +64,77 @@
       <div class="dashValue">${{ stats.avg_price_min }} - ${{ stats.avg_price_max }}</div>
       <div class="dashHint muted small">Average estimated client budget</div>
     </div>
+  </div>
+
+  <div class="dashPanel adminTablePanel">
+    <div class="dashPanel__head">
+      <h2 class="dashH2">Lead CRM</h2>
+      <span class="muted small">Users, scores, and follow-up status</span>
+    </div>
+
+    {% if leads %}
+      <div class="tableWrap">
+        <table class="adminTable">
+          <thead>
+            <tr>
+              <th>Lead</th>
+              <th>Email</th>
+              <th>Project</th>
+              <th>Budget</th>
+              <th>Score</th>
+              <th>Status</th>
+              <th>Saved</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for lead in leads %}
+              <tr>
+                <td>{{ lead.username or "Visitor" }}</td>
+                <td>{{ lead.email or "No email" }}</td>
+                <td>{{ lead.project_type }} / {{ lead.package }}</td>
+                <td>${{ lead.price_min }} - ${{ lead.price_max }}</td>
+                <td><span class="scorePill">{{ lead.lead_score }}/100</span></td>
+                <td>{{ lead.lead_status | title }}</td>
+                <td>{{ "Yes" if lead.is_saved else "No" }}</td>
+              </tr>
+              <tr>
+                <td colspan="7">
+                  <strong>AI Reply:</strong>
+                  <span class="muted">{{ ai_replies[lead.id] }}</span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="notice warning">No user leads yet. Ask a logged-in user to save a quote.</div>
+    {% endif %}
+  </div>
+
+  <div class="dashPanel adminTablePanel">
+    <div class="dashPanel__head">
+      <h2 class="dashH2">Project Kanban</h2>
+      <span class="muted small">Client rooms by status</span>
+    </div>
+
+    {% if projects %}
+      <div class="kanban">
+        {% for status in ["Discovery", "Proposal Approved", "Design", "Development", "Delivered"] %}
+          <section class="kanbanCol">
+            <h3>{{ status }}</h3>
+            {% for project in projects if project.status == status %}
+              <a class="kanbanCard" href="{{ url_for('admin.admin_project_room', project_id=project.id) }}">
+                <strong>{{ project.title }}</strong>
+                <span>{{ project.username }} | Score {{ project.lead_score or 0 }}/100</span>
+              </a>
+            {% endfor %}
+          </section>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="notice">No project rooms yet.</div>
+    {% endif %}
   </div>
 
   <div class="adminCharts">

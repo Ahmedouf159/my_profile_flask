@@ -126,3 +126,15 @@ def update_theme(user_id: int, theme: str):
         raise
     finally:
         conn.close()
+
+
+def mark_onboarding_seen(user_id: int):
+    conn = get_db()
+    try:
+        conn.execute("UPDATE users SET onboarding_seen=1 WHERE id=?", (user_id,))
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
